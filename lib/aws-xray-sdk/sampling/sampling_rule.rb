@@ -40,18 +40,17 @@ module XRay
       url_path = sampling_req[:url_path]
       service = sampling_req[:service]
 
-      host_match = !host || SearchPattern.wildcard_match?(pattern: @host, text: host)
-      path_match = !url_path || SearchPattern.wildcard_match?(pattern: @path, text: url_path)
-      method_match = !http_method || SearchPattern.wildcard_match?(pattern: @method, text: http_method)
-      service_match = !service || SearchPattern.wildcard_match?(pattern: @service, text: service)
+      host_match = @host == '*' || SearchPattern.wildcard_match?(pattern: @host, text: host)
+      path_match = @path == '*' ||  SearchPattern.wildcard_match?(pattern: @path, text: url_path)
+      method_match = @method == '*' || SearchPattern.wildcard_match?(pattern: @method, text: http_method)
+      service_match = @service == '*' || SearchPattern.wildcard_match?(pattern: @service, text: service)
 
-      # if sampling request contains service type we assmue
+      # if sampling request contains service type we assume
       # the origin (a.k.a AWS plugins are set and effective)
+      service_type_match = @service_type == '*' ? true : false
       if sampling_req.key?(:service_type)
         service_type = sampling_req[:service_type]
-        service_type_match = SearchPattern.wildcard_match?(pattern: @service_type, text: service_type)
-      else
-        service_type_match = @service_type == '*'
+        service_type_match = @service_type == '*' || SearchPattern.wildcard_match?(pattern: @service_type, text: service_type)
       end
       host_match && path_match && method_match && service_match && service_type_match
     end

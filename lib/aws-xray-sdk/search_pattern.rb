@@ -13,8 +13,6 @@ module XRay
       pattern_len = pattern.length
       text_len = text.length
       return text_len.zero? if pattern_len.zero?
-      # Check the special case of a single * pattern, as it's common
-      return true if pattern == '*'
 
       if case_insensitive
         # do not mutate original input
